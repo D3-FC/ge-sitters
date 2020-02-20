@@ -88,4 +88,17 @@ class User extends Authenticatable
     {
         $this->attributes['password'] = Hash::make($v);
     }
+
+    public function updateFromRequest(Http\Requests\UserUpdateRequest $request)
+    {
+
+    }
+
+    public function updateFromArray(array $params)
+    {
+        $this->email = data_get($params, 'email');
+        $this->name = data_get($params, 'name');
+        $this->phone = data_get($params, 'phone');
+        return $this;
+    }
 }

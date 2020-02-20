@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\User\RegisterRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\User;
 use Auth;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\Registered;
 
 class UserController extends Controller
@@ -16,6 +18,23 @@ class UserController extends Controller
         event(new Registered($user));
 
         Auth::guard()->login($user);
+
+        return $user;
+    }
+
+    /**
+     * @param  User  $user
+     *
+     * @param  UserUpdateRequest  $request
+     *
+     * @return User
+     * @throws AuthorizationException
+     */
+    public function update(User $user, UserUpdateRequest $request)
+    {
+        $this->authorize('view', $user);
+
+        $user->updateFromArray($request->all())->save();
 
         return $user;
     }
