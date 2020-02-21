@@ -25,8 +25,12 @@ class WrapResponse
             app('debugbar')->isEnabled() &&
             is_object($response->getData())
         ) {
+            $data = app('debugbar')->getData();
             $response->setData($response->getData(true) + [
-                    '_debugbar' => app('debugbar')->getData(),
+                    '_debugbar' =>[
+                        'queries_count'=> data_get($data, 'queries.nb_statements'),
+                        'queries'=> data_get($data, 'queries.statements.*.sql'),
+                    ],
                 ]);
         }
 
