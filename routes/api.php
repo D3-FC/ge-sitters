@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 
@@ -13,16 +14,20 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('/ping', function (){
-    return 'pong';
-});
+
+
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
 Route::post('/register', [UserController::class, 'register']);
 
-Route::group(['middleware'=>['auth:api']], function (){
+Route::group(['middleware' => ['auth:api']], function () {
 
     Route::post('/users/update', [UserController::class, 'update']);
+
+    Route::post('/articles/create', [ArticleController::class, 'create']);
+    Route::post('/articles/get-many', [ArticleController::class, 'getMany']);
+
 });

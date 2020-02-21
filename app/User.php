@@ -4,6 +4,7 @@ namespace App;
 
 use App\Http\Requests\User\RegisterRequest;
 use Hash;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -38,6 +39,17 @@ use Laravel\Passport\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string|null $phone
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\User onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User wherePhone($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\User withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\User withoutTrashed()
+ * @property-read \App\Admin $admin
+ * @property-read mixed $is_admin
  */
 class User extends Authenticatable
 {
@@ -85,6 +97,11 @@ class User extends Authenticatable
         return $u;
     }
 
+    public function admin(): HasOne
+    {
+        return $this->hasOne(Admin::class);
+    }
+
     public function setPasswordAttribute(string $v)
     {
         $this->attributes['password'] = Hash::make($v);
@@ -97,5 +114,15 @@ class User extends Authenticatable
         $this->phone = data_get($params, 'phone');
 
         return $this;
+    }
+
+    public function getIsAdminAttribute()
+    {
+        return !!$this->admin;
+    }
+
+    public function becomeAdmin(): void
+    {
+        $this->admin()->create();
     }
 }
