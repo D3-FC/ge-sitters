@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Article;
+use App\Message;
 use App\Policies\ArticlePolicy;
+use App\Policies\MessagePolicy;
 use App\Policies\UserPolicy;
 use App\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -19,6 +21,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         User::class => UserPolicy::class,
         Article::class => ArticlePolicy::class,
+        Message::class => MessagePolicy::class,
     ];
 
     /**

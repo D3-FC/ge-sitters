@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 
@@ -29,5 +30,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 
     Route::post('/articles/create', [ArticleController::class, 'create']);
     Route::post('/articles/get-many', [ArticleController::class, 'getMany']);
+
+    Route::post('/messages/create', [MessageController::class, 'create']);
+    Route::post('/messages/get-many', [MessageController::class, 'getMany']);
 
 });
