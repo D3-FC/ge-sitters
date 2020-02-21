@@ -30,8 +30,10 @@ class UserController extends Controller
      * @return User
      * @throws AuthorizationException
      */
-    public function update(User $user, UserUpdateRequest $request)
+    public function update(UserUpdateRequest $request)
     {
+        $user = User::findOrFail($request->input('id'));
+
         $this->authorize('view', $user);
 
         $user->updateFromArray($request->all())->save();

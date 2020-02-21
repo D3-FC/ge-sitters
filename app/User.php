@@ -4,6 +4,7 @@ namespace App;
 
 use App\Http\Requests\User\RegisterRequest;
 use Hash;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
@@ -41,7 +42,7 @@ use Laravel\Passport\HasApiTokens;
 class User extends Authenticatable
 {
 
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -89,16 +90,12 @@ class User extends Authenticatable
         $this->attributes['password'] = Hash::make($v);
     }
 
-    public function updateFromRequest(Http\Requests\UserUpdateRequest $request)
-    {
-
-    }
-
     public function updateFromArray(array $params)
     {
         $this->email = data_get($params, 'email');
         $this->name = data_get($params, 'name');
         $this->phone = data_get($params, 'phone');
+
         return $this;
     }
 }

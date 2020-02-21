@@ -25,13 +25,13 @@ class UserUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'=>'string|min:3|max:255|required',
-            'email'=>[
+            'name' => 'string|min:3|max:255|required',
+            'email' => [
                 'email',
                 'required',
-                Rule::unique('users')->ignore($this->segment(3))
+                Rule::unique('users')->ignore($this->id),
             ],
-            'phone'=>'string|nullable|regex:/^5\d{8}$/i'
+            'phone' => 'string|nullable|regex:/^5\d{8}$/i',
         ];
     }
 }

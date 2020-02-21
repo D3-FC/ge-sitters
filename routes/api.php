@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 
 /*
@@ -19,6 +20,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/register', [\App\Http\Controllers\UserController::class, 'register']);
+Route::post('/register', [UserController::class, 'register']);
 
-Route::post('/users/{user}/update', [\App\Http\Controllers\UserController::class, 'update']);
+Route::group(['middleware'=>['auth:api']], function (){
+
+    Route::post('/users/update', [UserController::class, 'update']);
+});
