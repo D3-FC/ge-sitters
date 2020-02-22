@@ -27,6 +27,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Schedule whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Schedule whereWorkerId($value)
  * @mixin \Eloquent
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\Schedule onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Schedule whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Schedule withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Schedule withoutTrashed()
  */
 class Schedule extends Model
 {
@@ -53,7 +60,10 @@ class Schedule extends Model
 
     private function associateWorker(Worker $worker): Schedule
     {
-        return $this->worker()->associate($worker);
+        /** @var Schedule $s */
+        $s = $this->worker()->associate($worker);
+
+        return $s;
     }
 
     private function worker(): BelongsTo

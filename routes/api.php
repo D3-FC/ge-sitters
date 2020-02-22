@@ -3,6 +3,7 @@
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PriceController;
+use App\Http\Controllers\PublishedWorkerController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkerController;
@@ -26,7 +27,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/register', [UserController::class, 'register']);
 
-Route::group(['middleware' => ['auth:api']], function () {
+Route::group(['middleware' => ['auth:api']], function () { // TODO: move auth:api to controllers directly
 
     Route::post('/users/update', [UserController::class, 'update']);
 
@@ -46,5 +47,9 @@ Route::group(['middleware' => ['auth:api']], function () {
 
     Route::post('/schedules/create', [ScheduleController::class, 'create']);
     Route::post('/schedules/delete', [ScheduleController::class, 'delete']);
+
+    Route::post('/published-workers/create', [PublishedWorkerController::class, 'create']);
+    Route::post('/published-workers/delete', [PublishedWorkerController::class, 'delete']);
+
 
 });

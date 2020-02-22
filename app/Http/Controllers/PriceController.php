@@ -4,14 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PriceCreateRequest;
 use App\Price;
+use App\User;
+use App\Worker;
 use Exception;
 use Illuminate\Http\Request;
 
 class PriceController extends Controller
 {
+    /**
+     * @var User
+     */
+    private $me;
+
+    public function __construct()
+    {
+        $this->me = \Auth::user();
+    }
+
     public function create(PriceCreateRequest $request)
     {
-        return \Auth::user()->worker->createPrice($request->all());
+        return $this->me->worker->createPrice($request->all());
     }
 
     /**
@@ -22,6 +34,6 @@ class PriceController extends Controller
      */
     public function delete(Request $request): void
     {
-        \Auth::user()->worker->bulkDeletePrice($request->id);
+        $this->me->worker->bulkDeletePrice($request->id);
     }
 }

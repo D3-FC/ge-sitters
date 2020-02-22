@@ -28,6 +28,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Price whereWorkerId($value)
  * @mixin \Eloquent
  * @property-read \App\Worker $worker
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\Price onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Price whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Price withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Price withoutTrashed()
  */
 class Price extends Model
 {

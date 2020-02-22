@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -14,9 +15,25 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @property int $id
  * @property int $user_id
+ * @property int|null $min_child_age
+ * @property int|null $max_child_age
+ * @property string|null $description
+ * @property string|null $animal_relationship
+ * @property float|null $meeting_price
+ * @property float|null $coords_x
+ * @property float|null $coords_y
+ * @property bool|null $has_card_payment
+ * @property bool|null $sits_special_children
+ * @property bool|null $has_training
+ * @property bool|null $can_overwork
+ * @property string|null $birthday
+ * @property string|null $mobile_number_confirmed_at
+ * @property string|null $passport_confirmed
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Price[] $prices
+ * @property-read int|null $prices_count
  * @property-read \App\User $user
  * @method static bool|null forceDelete()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker newModelQuery()
@@ -24,44 +41,28 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Worker onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker query()
  * @method static bool|null restore()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereUserId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Worker withTrashed()
- * @method static \Illuminate\Database\Query\Builder|\App\Worker withoutTrashed()
- * @mixin \Eloquent
- * @property int|null $min_child_age
- * @property int|null $max_child_age
- * @property string|null $description
- * @property string|null $animal_relationship
- * @property float|null $meeting_price
- * @property float $coords_x
- * @property float $coords_y
- * @property int|null $has_card_payment
- * @property int|null $sits_special_children
- * @property int|null $has_training
- * @property int|null $can_overwork
- * @property string|null $birthday
- * @property string|null $mobile_number_confirmed_at
- * @property string|null $passport_confirmed
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereAnimalRelationship($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereBirthday($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereCanOverwork($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereCoordsX($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereCoordsY($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereHasCardPayment($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereHasTraining($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereMaxChildAge($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereMeetingPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereMinChildAge($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereMobileNumberConfirmedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker wherePassportConfirmed($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereSitsSpecialChildren($value)
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Price[] $prices
- * @property-read int|null $prices_count
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereUserId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Worker withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Worker withoutTrashed()
+ * @mixin \Eloquent
  */
 class Worker extends Model
 {
@@ -175,6 +176,19 @@ class Worker extends Model
     public function bulkDeleteSchedule(int $id): void
     {
         $this->schedules()->whereId($id)->delete();
+    }
+
+    public function publish(): PublishedWorker
+    {
+        $pw = PublishedWorker::init([], $this);
+        $this->publishedWorker()->save($pw);
+
+        return $pw;
+    }
+
+    private function publishedWorker(): HasOne
+    {
+        return $this->hasOne(PublishedWorker::class);
     }
 
     private function createPricesFromParams(array $paramsList): bool  // TODO: mb remove 2020-02-22
