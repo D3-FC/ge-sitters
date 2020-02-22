@@ -62,6 +62,8 @@ use Laravel\Passport\Token;
  * @property-read \App\Worker $worker
  * @property-read mixed $is_client
  * @property-read mixed $is_worker
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Message[] $messages
+ * @property-read int|null $messages_count
  */
 class User extends Authenticatable
 {
@@ -98,25 +100,43 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public static function registerSaveFromRequest(RegisterRequest $request)
+    public static function registerSaveFromRequest(RegisterRequest $request): User
+    {
+        return static::register($request->all());
+    }
+
+    private static function register(array $params): User
     {
         $u = new User();
-        $u->name = $request->input('name');
-        $u->email = $request->input('email');
-        $u->password = $request->input('password');
+        $u->name = data_get($params, 'name');
+        $u->email = data_get($params, 'email');
+        $u->password = data_get($params, 'password');
         $u->save();
 
         return $u;
     }
 
-    public function client(): HasOne
+    public function becomeWorker(array $params): Worker
     {
-        return $this->hasOne(Client::class);
+        /** @var Worker $w */
+        $w =$this->worker()->save(Worker::init($params, $this));
+        return $w;
+
     }
 
     public function worker(): HasOne
     {
         return $this->hasOne(Worker::class);
+    }
+
+    public function becomeAdmin(): void
+    {
+        $this->admin()->create();
+    }
+
+    public function admin(): HasOne
+    {
+        return $this->hasOne(Admin::class);
     }
 
     public function messages(): HasMany
@@ -153,21 +173,21 @@ class User extends Authenticatable
         return !!$this->worker;
     }
 
-    public function becomeAdmin(): void
-    {
-        $this->admin()->create();
-    }
-
-    public function admin(): HasOne
-    {
-        return $this->hasOne(Admin::class);
-    }
-
     public function messageTo(array $params, User $user)
     {
         $m = Message::init($params, $this, $user);
         $m->save();
 
         return $m;
+    }
+
+    private function becomeClient(): void
+    {
+        $this->client()->create();
+    }
+
+    public function client(): HasOne
+    {
+        return $this->hasOne(Client::class);
     }
 }

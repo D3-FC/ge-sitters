@@ -29,14 +29,108 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Worker withTrashed()
  * @method static \Illuminate\Database\Query\Builder|\App\Worker withoutTrashed()
  * @mixin \Eloquent
+ * @property int|null $min_child_age
+ * @property int|null $max_child_age
+ * @property string|null $description
+ * @property string|null $animal_relationship
+ * @property float|null $meeting_price
+ * @property float $coords_x
+ * @property float $coords_y
+ * @property int|null $has_card_payment
+ * @property int|null $sits_special_children
+ * @property int|null $has_training
+ * @property int|null $can_overwork
+ * @property string|null $birthday
+ * @property string|null $mobile_number_confirmed_at
+ * @property string|null $passport_confirmed
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereAnimalRelationship($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereBirthday($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereCanOverwork($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereCoordsX($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereCoordsY($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereHasCardPayment($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereHasTraining($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereMaxChildAge($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereMeetingPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereMinChildAge($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereMobileNumberConfirmedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker wherePassportConfirmed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereSitsSpecialChildren($value)
  */
 class Worker extends Model
 {
     use SoftDeletes;
 
+    protected $dates = [
+        "birthday" => "date",
+        "mobile_number_confirmed_at" => "datetime",
+        "passport_confirmed" => "datetime",
+    ];
+
+    protected $casts = [
+        "meeting_price" => "float",
+        "has_card_payment" => "boolean",
+        "sits_special_children" => "boolean",
+        "has_training" => "boolean",
+        "can_overwork" => "boolean",
+    ];
+
+    public static function init(array $params, User $user)
+    {
+        $w = new static();
+
+        $w->fillFields($params);
+
+        $w->associateUser($user);
+
+        return $w;
+    }
+
+    private function fillFields(array $params): self
+    {
+        $this->max_child_age = data_get($params, 'max_child_age');
+        $this->min_child_age = data_get($params, 'min_child_age');
+        $this->description = data_get($params, 'description');
+        $this->animal_relationship = data_get($params, 'animal_relationship');
+        $this->meeting_price = data_get($params, 'meeting_price');
+        $this->coords_x = data_get($params, 'coords_x');
+        $this->coords_y = data_get($params, 'coords_y');
+        $this->has_card_payment = data_get($params, 'has_card_payment');
+        $this->sits_special_children = data_get($params, 'sits_special_children');
+        $this->has_training = data_get($params, 'has_training');
+        $this->can_overwork = data_get($params, 'can_overwork');
+        $this->birthday = data_get($params, 'birthday');
+
+        return $this;
+    }
+
+    private function associateUser(User $user)
+    {
+        $this->user()->associate($user);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function updateFromParams(array $params): bool
+    {
+        return $this->fillFields($params)->save();
+    }
+
+    private function createPricesFromParams(array $paramsList): bool  // TODO: mb remove 2020-02-22
+    {
+        $prices = collect($paramsList)->map(function (array $params) {
+            return Price::init($params, $this);
+        });
+
+        $r = Price::insert($prices->toArray());
+
+        $this->loadMissing('prices');
+
+        return $r;
     }
 
 }

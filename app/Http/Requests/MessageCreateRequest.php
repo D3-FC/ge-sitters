@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\R;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,11 +26,11 @@ class MessageCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'content' => 'required|string|max:30000',
-            'to_user.id' =>[
+            'content' => R::build([R::REQUIRED, R::TEXT]),
+            'to_user.id' => [
                 'required',
                 'exists:users,id',
-                Rule::notIn([\Auth::id()])
+                Rule::notIn([\Auth::id()]),
             ],
         ];
     }

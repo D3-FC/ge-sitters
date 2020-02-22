@@ -31,6 +31,12 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder|Message whereDeletedAt($value)
  * @method static Builder|Message withTrashed()
  * @method static Builder|Message withoutTrashed()
+ * @property int $from_user_id
+ * @property int $to_user_id
+ * @property-read \App\User $fromUser
+ * @property-read \App\User $toUser
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Message whereFromUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Message whereToUserId($value)
  */
 class Message extends Model
 {

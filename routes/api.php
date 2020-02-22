@@ -3,6 +3,7 @@
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WorkerController;
 use Illuminate\Http\Request;
 
 /*
@@ -33,5 +34,10 @@ Route::group(['middleware' => ['auth:api']], function () {
 
     Route::post('/messages/create', [MessageController::class, 'create']);
     Route::post('/messages/get-many', [MessageController::class, 'getMany']);
+
+    Route::post('/workers/create', [WorkerController::class, 'create']);
+    Route::post('/workers/update', [WorkerController::class, 'update']);
+    Route::post('/workers/get', [WorkerController::class, 'get']);
+    Route::post('/workers/get-many', [WorkerController::class, 'getMany']);
 
 });

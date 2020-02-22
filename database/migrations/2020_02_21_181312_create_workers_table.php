@@ -17,9 +17,31 @@ class CreateWorkersTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
 
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->tinyInteger('min_child_age')->nullable();
+            $table->tinyInteger('max_child_age')->nullable();
+
+            $table->text('description')->nullable();
+            $table->text('animal_relationship')->nullable();
+
+            $table->decimal('meeting_price', 5, 1)->nullable();
+            $table->decimal('coords_x', 10, 6)->nullable();
+            $table->decimal('coords_y', 10, 6)->nullable();
+
+
+            $table->boolean('has_card_payment')->nullable();
+            $table->boolean('sits_special_children')->nullable();
+            $table->boolean('has_training')->nullable();
+            $table->boolean('can_overwork')->nullable();
+
+
+            $table->date('birthday')->nullable();
+            $table->timestamp('mobile_number_confirmed_at')->nullable();
+            $table->timestamp('passport_confirmed')->nullable();
+
             $table->softDeletes();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
