@@ -2,8 +2,11 @@
 
 namespace App;
 
+use App\Enums\WorkerRelation;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -57,6 +60,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereMobileNumberConfirmedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker wherePassportConfirmed($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker whereSitsSpecialChildren($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Price[] $prices
+ * @property-read int|null $prices_count
  */
 class Worker extends Model
 {
@@ -120,6 +125,32 @@ class Worker extends Model
         return $this->fillFields($params)->save();
     }
 
+    public function createPrice(array $params)
+    {
+        $price = Price::init($params, $this);
+        $this->prices()->save($price);
+
+        return $price;
+    }
+
+    /**
+     * @return HasMany|Price
+     */
+    public function prices(): HasMany
+    {
+        return $this->hasMany(Price::class);
+    }
+
+    /**
+     * @param  int  $id
+     *
+     * @throws Exception
+     */
+    public function bulkDeletePrice(int $id): void
+    {
+        $this->prices()->whereId($id)->delete();
+    }
+
     private function createPricesFromParams(array $paramsList): bool  // TODO: mb remove 2020-02-22
     {
         $prices = collect($paramsList)->map(function (array $params) {
@@ -128,7 +159,7 @@ class Worker extends Model
 
         $r = Price::insert($prices->toArray());
 
-        $this->loadMissing('prices');
+        $this->loadMissing(WorkerRelation::PRICES);
 
         return $r;
     }

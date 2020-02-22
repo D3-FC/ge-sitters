@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\Http\Requests\User\RegisterRequest;
+use App\Http\Requests\RegisterRequest;
 use Eloquent;
 use Hash;
 use Illuminate\Database\Eloquent\Collection;

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * App\Price
@@ -26,9 +27,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Price whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Price whereWorkerId($value)
  * @mixin \Eloquent
+ * @property-read \App\Worker $worker
  */
 class Price extends Model
 {
+
+    use SoftDeletes;
 
     public static function init(array $params, Worker $worker): self
     {
@@ -40,22 +44,18 @@ class Price extends Model
         return $p;
     }
 
-    //
-
     private function fillFields(array $params)
     {
         $this->children_count = data_get($params, 'children_count');
         $this->amount_per_hour = data_get($params, 'amount_per_hour');
         $this->over_time_amount_per_hour = data_get($params, 'over_time_amount_per_hour');
-
     }
 
-    private function associateWorker(Worker $worker): Worker
+    private function associateWorker(Worker $worker): Price
     {
-        /** @var Worker $w */
-        $w = $this->worker()->associate($worker);
+        $this->worker()->associate($worker);
 
-        return $w;
+        return $this;
     }
 
     public function worker(): BelongsTo

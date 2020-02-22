@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\WorkerRelation;
 use App\Http\Requests\WorkerCreateUpdateRequest;
 use App\Worker;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ class WorkerController extends Controller
         $me = \Auth::user();
 
         if ($me->is_admin) {
-            abort(403);//TODO: implement
+            abort(404);//TODO: implement
         }
 
         if ($me->is_worker) {
@@ -28,7 +29,7 @@ class WorkerController extends Controller
         $me = \Auth::user();
 
         if ($me->is_admin) {
-            abort(403);//TODO: implement
+            abort(404);//TODO: implement
         }
 
         /** @var Worker $worker */
@@ -44,11 +45,16 @@ class WorkerController extends Controller
         $me = \Auth::user();
 
         if ($me->is_admin) {
-            abort(403);//TODO: implement
+            abort(404);//TODO: implement
         }
 
-        return $me->worker;
+        if ($me->is_worker) {
+            return $me->worker->load(WorkerRelation::PRICES, WorkerRelation::SCHEDULES);
+        }
+
+        return abort(404);
     }
+
 
     public function getMany(Request $request)
     {

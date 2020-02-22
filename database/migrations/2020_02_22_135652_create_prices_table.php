@@ -20,6 +20,8 @@ class CreatePricesTable extends Migration
             $table->tinyInteger('children_count');
             $table->decimal('amount_per_hour', 5, 1)->nullable();
             $table->decimal('over_time_amount_per_hour', 5, 1)->nullable();
+
+            $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('worker_id')->references('id')->on('workers');

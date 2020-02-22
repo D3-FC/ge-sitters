@@ -20,6 +20,8 @@ class CreateSchedulesTable extends Migration
             $table->enum('day', [1,2,3,4,5,6,7])->nullable();
             $table->time('from')->nullable();
             $table->time('to')->nullable();
+
+            $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('worker_id')->references('id')->on('workers');

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\User\RegisterRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\User;
 use Auth;

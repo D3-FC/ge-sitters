@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PriceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkerController;
 use Illuminate\Http\Request;
@@ -39,5 +40,8 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/workers/update', [WorkerController::class, 'update']);
     Route::post('/workers/get', [WorkerController::class, 'get']);
     Route::post('/workers/get-many', [WorkerController::class, 'getMany']);
+
+    Route::post('/prices/create', [PriceController::class, 'create']);
+    Route::post('/prices/delete', [PriceController::class, 'delete']);
 
 });
