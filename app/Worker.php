@@ -151,6 +151,32 @@ class Worker extends Model
         $this->prices()->whereId($id)->delete();
     }
 
+    public function createSchedule(array $params): Schedule
+    {
+        $schedule = Schedule::init($params, $this);
+        $this->schedules()->save($schedule);
+
+        return $schedule;
+    }
+
+    /**
+     * @return HasMany|Schedule
+     */
+    private function schedules(): HasMany
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
+    /**
+     * @param  int  $id
+     *
+     * @throws Exception
+     */
+    public function bulkDeleteSchedule(int $id): void
+    {
+        $this->schedules()->whereId($id)->delete();
+    }
+
     private function createPricesFromParams(array $paramsList): bool  // TODO: mb remove 2020-02-22
     {
         $prices = collect($paramsList)->map(function (array $params) {

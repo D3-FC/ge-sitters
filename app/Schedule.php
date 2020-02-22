@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -30,4 +31,33 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Schedule extends Model
 {
     use SoftDeletes;
+
+    public static function init(array $params, Worker $worker): Schedule
+    {
+        $s = new static();
+        $s->fillFields($params);
+
+        $s->associateWorker($worker);
+
+        return $s;
+    }
+
+    private function fillFields(array $params): self
+    {
+        $this->day = data_get($params, 'day');
+        $this->from = data_get($params, 'from');
+        $this->to = data_get($params, 'to');
+
+        return $this;
+    }
+
+    private function associateWorker(Worker $worker): Schedule
+    {
+        return $this->worker()->associate($worker);
+    }
+
+    private function worker(): BelongsTo
+    {
+        return $this->belongsTo(Worker::class);
+    }
 }

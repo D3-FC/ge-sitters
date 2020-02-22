@@ -3,6 +3,7 @@
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PriceController;
+use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkerController;
 use Illuminate\Http\Request;
@@ -17,7 +18,6 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
 
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
@@ -43,5 +43,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 
     Route::post('/prices/create', [PriceController::class, 'create']);
     Route::post('/prices/delete', [PriceController::class, 'delete']);
+
+    Route::post('/schedules/create', [ScheduleController::class, 'create']);
+    Route::post('/schedules/delete', [ScheduleController::class, 'delete']);
 
 });

@@ -7,11 +7,20 @@ use App\Price;
 use Exception;
 use Illuminate\Http\Request;
 
-class PriceController extends Controller
+class ScheduleController extends Controller
 {
     public function create(PriceCreateRequest $request)
     {
-        return \Auth::user()->worker->createPrice($request->all());
+        $me = \Auth::user();
+
+        if ($me->is_admin) {
+            abort(404); //TODO: implement
+        }
+        if (!$me->is_worker) {
+            abort(403);
+        }
+
+        return $me->worker->createSchedule($request->all());
     }
 
     /**
@@ -22,6 +31,6 @@ class PriceController extends Controller
      */
     public function delete(Request $request): void
     {
-        \Auth::user()->worker->bulkDeletePrice($request->id);
+        \Auth::user()->worker->bulkDeleteSchedule($request->id);
     }
 }
