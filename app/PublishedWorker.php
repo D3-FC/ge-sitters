@@ -29,6 +29,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\PublishedWorker withTrashed()
  * @method static \Illuminate\Database\Query\Builder|\App\PublishedWorker withoutTrashed()
  * @mixin \Eloquent
+ * @property-read \App\Worker $worker
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\PublishedWorker withPrices()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\PublishedWorker withSchedules()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\PublishedWorker withUser()
  */
 class PublishedWorker extends Model
 {
@@ -54,7 +58,7 @@ class PublishedWorker extends Model
     /**
      * @return BelongsTo|Worker
      */
-    private function worker(): BelongsTo
+    public function worker(): BelongsTo
     {
         return $this->belongsTo(Worker::class);
     }
@@ -68,5 +72,6 @@ class PublishedWorker extends Model
     {
         static::whereId($id)->delete();
     }
+
 
 }

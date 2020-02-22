@@ -11,26 +11,25 @@ use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
 {
-    /**
-     * @var User
-     */
-    private $me;
-
-    public function __construct()
-    {
-        $this->me = Auth::user();
-    }
 
     public function create(PriceCreateRequest $request)
     {
-        if ($this->me->is_admin) {
+        if ($this->me()->is_admin) {
             abort(404); //TODO: implement
         }
-        if (!$this->me->is_worker) {
+        if (!$this->me()->is_worker) {
             abort(403);
         }
 
-        return $this->me->worker->createSchedule($request->all());
+        return $this->me()->worker->createSchedule($request->all());
+    }
+
+    private function me()
+    {
+        /** @var User $u */
+        $u = Auth::user();
+
+        return $u;
     }
 
     /**
@@ -41,6 +40,6 @@ class ScheduleController extends Controller
      */
     public function delete(Request $request): void
     {
-        $this->me->worker->bulkDeleteSchedule($request->id);
+        $this->me()->worker->bulkDeleteSchedule($request->id);
     }
 }

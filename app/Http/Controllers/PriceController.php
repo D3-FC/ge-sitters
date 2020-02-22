@@ -11,19 +11,10 @@ use Illuminate\Http\Request;
 
 class PriceController extends Controller
 {
-    /**
-     * @var User
-     */
-    private $me;
-
-    public function __construct()
-    {
-        $this->me = \Auth::user();
-    }
 
     public function create(PriceCreateRequest $request)
     {
-        return $this->me->worker->createPrice($request->all());
+        return $this->me()->worker->createPrice($request->all());
     }
 
     /**
@@ -34,6 +25,15 @@ class PriceController extends Controller
      */
     public function delete(Request $request): void
     {
-        $this->me->worker->bulkDeletePrice($request->id);
+        $this->me()->worker->bulkDeletePrice($request->id);
+    }
+
+
+    private function me()
+    {
+        /** @var User $me */
+        $me = \Auth::user();
+
+        return $me;
     }
 }

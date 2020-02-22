@@ -3,20 +3,14 @@
 namespace App;
 
 use App\Http\Requests\RegisterRequest;
-use Eloquent;
+use App\Interfaces\Me;
 use Hash;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\DatabaseNotification;
-use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Carbon;
 use Laravel\Passport\HasApiTokens;
-use Laravel\Passport\Token;
 
 /**
  * App\User
@@ -65,7 +59,7 @@ use Laravel\Passport\Token;
  * @method static \Illuminate\Database\Query\Builder|\App\User withoutTrashed()
  * @mixin \Eloquent
  */
-class User extends Authenticatable
+class User extends Authenticatable implements Me
 {
 
     use HasApiTokens, Notifiable, SoftDeletes;
@@ -119,11 +113,15 @@ class User extends Authenticatable
     public function becomeWorker(array $params): Worker
     {
         /** @var Worker $w */
-        $w =$this->worker()->save(Worker::init($params, $this));
+        $w = $this->worker()->save(Worker::init($params, $this));
+
         return $w;
 
     }
 
+    /**
+     * @return HasOne|Worker
+     */
     public function worker(): HasOne
     {
         return $this->hasOne(Worker::class);

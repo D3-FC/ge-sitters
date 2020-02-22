@@ -4,6 +4,7 @@ namespace App;
 
 use App\Enums\WorkerRelation;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -63,6 +64,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Worker withTrashed()
  * @method static \Illuminate\Database\Query\Builder|\App\Worker withoutTrashed()
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker withPrices()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker withSchedules()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker withUser()
  */
 class Worker extends Model
 {
@@ -163,7 +167,7 @@ class Worker extends Model
     /**
      * @return HasMany|Schedule
      */
-    private function schedules(): HasMany
+    public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class);
     }
@@ -189,6 +193,21 @@ class Worker extends Model
     private function publishedWorker(): HasOne
     {
         return $this->hasOne(PublishedWorker::class);
+    }
+
+    public function loadPrices(): self
+    {
+        return $this->load(WorkerRelation::PRICES);
+    }
+
+    public function loadSchedules(): self
+    {
+        return $this->load(WorkerRelation::SCHEDULES);
+    }
+
+    public function loadUser(): self
+    {
+        return $this->load(WorkerRelation::USER);
     }
 
     private function createPricesFromParams(array $paramsList): bool  // TODO: mb remove 2020-02-22

@@ -51,5 +51,8 @@ Route::group(['middleware' => ['auth:api']], function () { // TODO: move auth:ap
     Route::post('/published-workers/create', [PublishedWorkerController::class, 'create']);
     Route::post('/published-workers/delete', [PublishedWorkerController::class, 'delete']);
 
-
 });
+
+
+Route::post('/published-workers/get', [PublishedWorkerController::class, 'get']);
+Route::post('/published-workers/get-many', [PublishedWorkerController::class, 'getMany']);
