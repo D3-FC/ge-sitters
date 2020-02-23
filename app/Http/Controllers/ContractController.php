@@ -19,7 +19,7 @@ class ContractController extends Controller
         $offerId = $request->input('offer.id');
 
         if ($me->is_worker) {
-            return $me->worker->getOfferById($offerId)->createContract();
+            return $me->worker->getOfferById($offerId)->accept();
         }
 
         abort(404);

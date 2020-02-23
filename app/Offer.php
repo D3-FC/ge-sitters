@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Offer whereAdvertisementId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Offer whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Offer wherePublishedWorkerId($value)
+ * @property-read \App\Refusal $refusal
  */
 class Offer extends Model
 {
@@ -68,10 +69,10 @@ class Offer extends Model
         return $this->belongsTo(Advertisement::class);
     }
 
-    public function createContract(): Contract
+    public function accept(): Contract
     {
         if ($this->contract) {
-            abort(403, 'This offer already has contract.');
+            abort(403, 'Already accepted');
         }
         /** @var Contract $c */
         $c = $this->contract()->create();
@@ -82,5 +83,21 @@ class Offer extends Model
     public function contract(): HasOne
     {
         return $this->hasOne(Contract::class);
+    }
+
+    public function refusal(): HasOne
+    {
+        return $this->hasOne(Refusal::class);
+    }
+
+    public function refuse()
+    {
+        if ($this->refusal) {
+            abort(403, 'Already refused.');
+        }
+        /** @var Refusal $r */
+        $r = $this->refusal()->create();
+
+        return $r;
     }
 }

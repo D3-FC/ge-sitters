@@ -8,6 +8,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\PublishedWorkerController;
+use App\Http\Controllers\RefusalController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkerController;
@@ -64,6 +65,8 @@ Route::group(['middleware' => ['auth:api']], function () { // TODO: move auth:ap
     Route::post('/offers/create', [OfferController::class, 'create']);
 
     Route::post('/contracts/create', [ContractController::class, 'create']);
+
+    Route::post('/refuses/create', [RefusalController::class, 'create']);
 
 });
 
