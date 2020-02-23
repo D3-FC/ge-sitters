@@ -87,7 +87,7 @@ class Client extends Model
     }
 
     /**
-     * @return HasManyThrough|Advertisement
+     * @return HasManyThrough|Offer
      */
     public function offers(): HasManyThrough
     {

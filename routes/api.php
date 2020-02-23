@@ -63,6 +63,7 @@ Route::group(['middleware' => ['auth:api']], function () { // TODO: move auth:ap
     Route::post('/advertisements/create', [AdvertisementController::class, 'create']);
 
     Route::post('/offers/create', [OfferController::class, 'create']);
+    Route::post('/offers/get-many', [OfferController::class, 'getMany']);
 
     Route::post('/contracts/create', [ContractController::class, 'create']);
 

@@ -19,6 +19,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Refusal withTrashed()
  * @method static \Illuminate\Database\Query\Builder|\App\Refusal withoutTrashed()
  * @mixin \Eloquent
+ * @property int $id
+ * @property int $offer_id
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Refusal whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Refusal whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Refusal whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Refusal whereOfferId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Refusal whereUpdatedAt($value)
  */
 class Refusal extends Model
 {

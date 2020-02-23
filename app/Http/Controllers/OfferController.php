@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Advertisement;
+use App\Enums\OfferRelation;
 use App\Http\Middleware\ValidateIsClient;
 use App\Offer;
 use App\PublishedWorker;
 use App\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 class OfferController extends Controller
@@ -37,5 +39,44 @@ class OfferController extends Controller
         $me = \Auth::user();
 
         return $me;
+    }
+
+    public function getMany(Request $request)
+    {
+        $me = $this->me();
+
+        if ($me->is_admin) {
+            abort(404);
+        }
+
+
+        if ($me->is_client) {
+            return $this->paginateOffersQuery($me->client->offers(), $request);
+        }
+
+        if ($me->is_worker) {
+            return $this->paginateOffersQuery($me->worker->offers(), $request);
+        }
+
+        return abort(404);
+    }
+
+    /**
+     * @param  Offer  $q
+     *
+     * @param  Request  $request
+     *
+     * @return LengthAwarePaginator
+     */
+    public function paginateOffersQuery($q, Request $request)
+    {
+        return $q
+            ->filteredBy($request->all())
+            ->with([
+                OfferRelation::CONTRACT,
+                OfferRelation::REFUSAL,
+                OfferRelation::PUBLISHED_WORKER,
+            ])
+            ->paginate(50);
     }
 }

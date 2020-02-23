@@ -205,6 +205,9 @@ class Worker extends Model
         return $o;
     }
 
+    /**
+     * @return HasManyThrough|Offer
+     */
     public function offers(): HasManyThrough
     {
         return $this->hasManyThrough(Offer::class, PublishedWorker::class);

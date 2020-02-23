@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Enums\OfferRelation;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -35,6 +37,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Offer whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Offer wherePublishedWorkerId($value)
  * @property-read \App\Refusal $refusal
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Offer accepted()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Offer refused()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Offer filteredBy($params)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Offer pending()
  */
 class Offer extends Model
 {
@@ -85,11 +91,6 @@ class Offer extends Model
         return $this->hasOne(Contract::class);
     }
 
-    public function refusal(): HasOne
-    {
-        return $this->hasOne(Refusal::class);
-    }
-
     public function refuse()
     {
         if ($this->refusal) {
@@ -99,5 +100,58 @@ class Offer extends Model
         $r = $this->refusal()->create();
 
         return $r;
+    }
+
+    public function refusal(): HasOne
+    {
+        return $this->hasOne(Refusal::class);
+    }
+
+    /**
+     * @param  Builder|self  $q
+     *
+     * @return Builder|self
+     */
+    public function scopeAccepted(Builder $q): Builder
+    {
+        return $q->whereHas(OfferRelation::CONTRACT);
+    }
+
+    /**
+     * @param  Builder|self  $q
+     *
+     * @return Builder|self
+     */
+    public function scopeRefused(Builder $q): Builder
+    {
+        return $q->whereHas(OfferRelation::REFUSAL);
+    }
+    /**
+     * @param  Builder|self  $q
+     *
+     * @return Builder|self
+     */
+    public function scopePending(Builder $q): Builder
+    {
+        return $q->whereDoesntHave(OfferRelation::REFUSAL)->whereDoesntHave(OfferRelation::CONTRACT);
+    }
+
+    public function scopeFilteredBy(Builder $q, array $params): Builder
+    {
+        $q->when(data_get($params, 'accepted'), function (Builder $q, $v) {
+            /** @var Offer $q */
+            return $q->accepted();
+        });
+        $q->when(data_get($params, 'refused'), function (Builder $q, $v) {
+            /** @var Offer $q */
+            return $q->refused();
+        });
+        $q->when(data_get($params, 'pending'), function (Builder $q, $v) {
+            /** @var Offer $q */
+            return $q->pending();
+        });
+
+        return $q;
+
     }
 }
