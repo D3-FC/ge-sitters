@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\R;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ArticleCreate extends FormRequest
+class AdvertisementCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +14,7 @@ class ArticleCreate extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +25,12 @@ class ArticleCreate extends FormRequest
     public function rules()
     {
         return [
-            //
+            'children_count' => R::CHILDREN_COUNT,
+            'price' => R::MONEY_SIMPLE,
+            'description' => R::TEXT_OPTIONAL,
+            'date' => 'date|after:yesterday',
+            'from' => R::TIME,
+            'to' => R::TIME.'|after:from',
         ];
     }
 }

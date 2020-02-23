@@ -30,12 +30,14 @@ class MessageController extends Controller
 
     public function getMany()
     {
+        /** @var User $me */
         $me = \Auth::user();
 
         if ($me->is_admin) {
             return Message::paginate(50);
         }
 
-        return $me->messages()->paginate(50);
+
+        return $me->myMessages()->paginate(50);
     }
 }

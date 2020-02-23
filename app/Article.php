@@ -34,15 +34,13 @@ class Article extends Model
 {
     use SoftDeletes;
 
-
+    protected $fillable = [
+        'title',
+        'content',
+    ];
 
     public static function init(array $params)
     {
-        $a = new static();
-
-        $a->title = data_get($params, 'title');
-        $a->content = data_get($params, 'content');
-
-        return $a;
+        return static::make($params);
     }
 }

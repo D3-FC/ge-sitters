@@ -41,21 +41,15 @@ class Price extends Model
 
     use SoftDeletes;
 
+    protected $fillable = [
+        'children_count',
+        'amount_per_hour',
+        'over_time_amount_per_hour',
+    ];
+
     public static function init(array $params, Worker $worker): self
     {
-        $p = new static();
-        $p->fillFields($params);
-
-        $p->associateWorker($worker);
-
-        return $p;
-    }
-
-    private function fillFields(array $params)
-    {
-        $this->children_count = data_get($params, 'children_count');
-        $this->amount_per_hour = data_get($params, 'amount_per_hour');
-        $this->over_time_amount_per_hour = data_get($params, 'over_time_amount_per_hour');
+        return static::make($params)->associateWorker($worker); $p;
     }
 
     private function associateWorker(Worker $worker): Price

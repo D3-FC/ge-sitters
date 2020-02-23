@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRelation;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\User;
@@ -39,5 +40,14 @@ class UserController extends Controller
         $user->updateFromArray($request->all())->save();
 
         return $user;
+    }
+
+    public function me()
+    {
+        return Auth::user()->load(
+            UserRelation::ADMIN,
+            UserRelation::WORKER,
+            UserRelation::CLIENT,
+        );
     }
 }

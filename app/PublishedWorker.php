@@ -40,19 +40,14 @@ class PublishedWorker extends Model
 
     public static function init(array $params, Worker $worker): self
     {
-        $pw = new static();
-
-        $pw->associateWorker($worker);
-
-        return $pw;
+        return static::make($params)->associateWorker($worker);
     }
 
-    private function associateWorker(Worker $worker): PublishedWorker
+    private function associateWorker(Worker $worker): self
     {
-        /** @var PublishedWorker $pw */
-        $pw = $this->worker()->associate($worker);
+        $this->worker()->associate($worker);
 
-        return $pw;
+        return $this;
     }
 
     /**
@@ -70,7 +65,7 @@ class PublishedWorker extends Model
      */
     public static function deleteById(int $id)
     {
-        static::whereId($id)->delete();
+        static::whereWorkerId($id)->delete();
     }
 
 

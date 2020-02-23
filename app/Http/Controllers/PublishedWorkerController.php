@@ -39,11 +39,10 @@ class PublishedWorkerController extends Controller
 
     /**
      * @param  Request|PublishedWorker  $request
-     * @param  Relation  $r
      *
      * @return PublishedWorker
      */
-    public function get(Request $request, Relation $r): PublishedWorker
+    public function get(Request $request): PublishedWorker
     {
 
         /** @var PublishedWorker $pw */
@@ -58,11 +57,9 @@ class PublishedWorkerController extends Controller
     }
 
     /**
-     * @param  Request|PublishedWorker  $request
-     *
      * @return PublishedWorker
      */
-    public function getMany(Request $request)
+    public function getMany()
     {
         /** @var PublishedWorker $pw */
         $pw = PublishedWorker::with([

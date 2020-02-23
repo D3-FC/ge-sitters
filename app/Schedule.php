@@ -39,26 +39,19 @@ class Schedule extends Model
 {
     use SoftDeletes;
 
+    protected $fillable = [
+      'day',
+      'from',
+      'to',
+    ];
+
     public static function init(array $params, Worker $worker): Schedule
     {
-        $s = new static();
-        $s->fillFields($params);
-
-        $s->associateWorker($worker);
-
-        return $s;
+        return static::make($params)->associateWorker($worker);
     }
 
-    private function fillFields(array $params): self
-    {
-        $this->day = data_get($params, 'day');
-        $this->from = data_get($params, 'from');
-        $this->to = data_get($params, 'to');
 
-        return $this;
-    }
-
-    private function associateWorker(Worker $worker): Schedule
+    private function associateWorker(Worker $worker): self
     {
         /** @var Schedule $s */
         $s = $this->worker()->associate($worker);

@@ -3,8 +3,8 @@
 namespace App;
 
 use App\Http\Requests\RegisterRequest;
-use App\Interfaces\Me;
 use Hash;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -58,8 +58,12 @@ use Laravel\Passport\HasApiTokens;
  * @method static \Illuminate\Database\Query\Builder|\App\User withTrashed()
  * @method static \Illuminate\Database\Query\Builder|\App\User withoutTrashed()
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Message[] $receivedMessages
+ * @property-read int|null $received_messages_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Message[] $sentMessages
+ * @property-read int|null $sent_messages_count
  */
-class User extends Authenticatable implements Me
+class User extends Authenticatable
 {
 
     use HasApiTokens, Notifiable, SoftDeletes;
@@ -73,6 +77,7 @@ class User extends Authenticatable implements Me
         'name',
         'email',
         'password',
+        'phone',
     ];
 
     /**
@@ -101,13 +106,7 @@ class User extends Authenticatable implements Me
 
     private static function register(array $params): User
     {
-        $u = new User();
-        $u->name = data_get($params, 'name');
-        $u->email = data_get($params, 'email');
-        $u->password = data_get($params, 'password');
-        $u->save();
-
-        return $u;
+        return User::create($params);
     }
 
     public function becomeWorker(array $params): Worker
@@ -137,9 +136,14 @@ class User extends Authenticatable implements Me
         return $this->hasOne(Admin::class);
     }
 
-    public function messages(): HasMany
+    public function sentMessages(): HasMany
     {
-        return $this->hasMany(Message::class);
+        return $this->hasMany(Message::class, 'from_user_id');
+    }
+
+    public function receivedMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'to_user_id');
     }
 
     public function setPasswordAttribute(string $v)
@@ -149,9 +153,7 @@ class User extends Authenticatable implements Me
 
     public function updateFromArray(array $params)
     {
-        $this->email = data_get($params, 'email');
-        $this->name = data_get($params, 'name');
-        $this->phone = data_get($params, 'phone');
+        $this->fill($params);
 
         return $this;
     }
@@ -179,13 +181,27 @@ class User extends Authenticatable implements Me
         return $m;
     }
 
-    private function becomeClient(): void
+    public function becomeClient(): Client
     {
-        $this->client()->create();
+        /** @var Client $client */
+        $client = $this->client()->create();
+
+        return $client;
     }
 
     public function client(): HasOne
     {
         return $this->hasOne(Client::class);
+    }
+
+    public function myMessages(): Builder
+    {
+        return Message::orWhere(function (Builder $q) {
+            /** @var Message $q */
+            return $q->whereToUserId($this->id);
+        })->orWhere(function (Builder $q) {
+            /** @var Message $q */
+            return $q->whereFromUserId($this->id);
+        });
     }
 }

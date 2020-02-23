@@ -17,13 +17,13 @@ class CreateWorkersTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
 
-            $table->tinyInteger('min_child_age')->nullable();
-            $table->tinyInteger('max_child_age')->nullable();
+            $table->tinyInteger('min_child_age')->nullable()->unsigned();
+            $table->tinyInteger('max_child_age')->nullable()->unsigned();
 
             $table->text('description')->nullable();
             $table->text('animal_relationship')->nullable();
 
-            $table->decimal('meeting_price', 5, 1)->nullable();
+            $table->decimal('meeting_price', 8, 2)->nullable()->unsigned();
             $table->decimal('coords_x', 10, 6)->nullable();
             $table->decimal('coords_y', 10, 6)->nullable();
 

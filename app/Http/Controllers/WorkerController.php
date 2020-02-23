@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\WorkerRelation;
 use App\Http\Requests\WorkerCreateUpdateRequest;
 use App\User;
-use App\Worker;
 use Illuminate\Http\Request;
 
 class WorkerController extends Controller
@@ -20,7 +20,7 @@ class WorkerController extends Controller
             abort(403, 'You are already a worker');
         }
 
-        return $this->me()->becomeWorker($request->all());
+        return $this->me()->becomeWorker($request->all())->load(WorkerRelation::USER);
     }
 
     public function me(): User
@@ -37,12 +37,9 @@ class WorkerController extends Controller
             abort(404);//TODO: implement
         }
 
-        /** @var Worker $worker */
-        $worker = $this->me()->worker;
+        $this->me()->worker->updateFromParams($request->all());
 
-        $worker->updateFromParams($request->all());
-
-        return $worker;
+        return $this->me()->worker;
     }
 
     public function get(Request $request)
@@ -52,7 +49,12 @@ class WorkerController extends Controller
         }
 
         if ($this->me()->is_worker) {
-            return $this->me()->worker->loadPrices()->loadSchedules()->loadUser();
+            return $this->me()->worker->load([
+                WorkerRelation::USER,
+                WorkerRelation::SCHEDULES,
+                WorkerRelation::PRICES,
+                WorkerRelation::PUBLISHED_WORKER,
+            ]);
         }
 
         return abort(404);

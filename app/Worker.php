@@ -2,12 +2,11 @@
 
 namespace App;
 
-use App\Enums\WorkerRelation;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -67,10 +66,30 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker withPrices()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker withSchedules()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Worker withUser()
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Schedule[] $schedules
+ * @property-read int|null $schedules_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Offer[] $offers
+ * @property-read int|null $offers_count
+ * @property-read \App\PublishedWorker $publishedWorker
  */
 class Worker extends Model
 {
     use SoftDeletes;
+
+    protected $fillable = [
+        'max_child_age',
+        'min_child_age',
+        'description',
+        'animal_relationship',
+        'meeting_price',
+        'coords_x',
+        'coords_y',
+        'has_card_payment',
+        'sits_special_children',
+        'has_training',
+        'can_overwork',
+        'birthday',
+    ];
 
     protected $dates = [
         "birthday" => "date",
@@ -88,36 +107,16 @@ class Worker extends Model
 
     public static function init(array $params, User $user)
     {
-        $w = new static();
+        return static::make($params)->associateUser($user);
+    }
 
-        $w->fillFields($params);
 
-        $w->associateUser($user);
+    private function associateUser(User $user): self
+    {
+        /** @var self $w */
+        $w = $this->user()->associate($user);
 
         return $w;
-    }
-
-    private function fillFields(array $params): self
-    {
-        $this->max_child_age = data_get($params, 'max_child_age');
-        $this->min_child_age = data_get($params, 'min_child_age');
-        $this->description = data_get($params, 'description');
-        $this->animal_relationship = data_get($params, 'animal_relationship');
-        $this->meeting_price = data_get($params, 'meeting_price');
-        $this->coords_x = data_get($params, 'coords_x');
-        $this->coords_y = data_get($params, 'coords_y');
-        $this->has_card_payment = data_get($params, 'has_card_payment');
-        $this->sits_special_children = data_get($params, 'sits_special_children');
-        $this->has_training = data_get($params, 'has_training');
-        $this->can_overwork = data_get($params, 'can_overwork');
-        $this->birthday = data_get($params, 'birthday');
-
-        return $this;
-    }
-
-    private function associateUser(User $user)
-    {
-        $this->user()->associate($user);
     }
 
     public function user(): BelongsTo
@@ -127,7 +126,7 @@ class Worker extends Model
 
     public function updateFromParams(array $params): bool
     {
-        return $this->fillFields($params)->save();
+        return $this->fill($params)->save();
     }
 
     public function createPrice(array $params)
@@ -184,43 +183,30 @@ class Worker extends Model
 
     public function publish(): PublishedWorker
     {
+        if($this->publishedWorker){
+            abort(403, 'Already published');
+        }
         $pw = PublishedWorker::init([], $this);
         $this->publishedWorker()->save($pw);
 
         return $pw;
     }
 
-    private function publishedWorker(): HasOne
+    public function publishedWorker(): HasOne
     {
         return $this->hasOne(PublishedWorker::class);
     }
 
-    public function loadPrices(): self
+    public function getOfferById(int $id): Offer
     {
-        return $this->load(WorkerRelation::PRICES);
+        /** @var Offer $o */
+        $o = $this->offers()->findOrFail($id);
+
+        return $o;
     }
 
-    public function loadSchedules(): self
+    public function offers(): HasManyThrough
     {
-        return $this->load(WorkerRelation::SCHEDULES);
+        return $this->hasManyThrough(Offer::class, PublishedWorker::class);
     }
-
-    public function loadUser(): self
-    {
-        return $this->load(WorkerRelation::USER);
-    }
-
-    private function createPricesFromParams(array $paramsList): bool  // TODO: mb remove 2020-02-22
-    {
-        $prices = collect($paramsList)->map(function (array $params) {
-            return Price::init($params, $this);
-        });
-
-        $r = Price::insert($prices->toArray());
-
-        $this->loadMissing(WorkerRelation::PRICES);
-
-        return $r;
-    }
-
 }

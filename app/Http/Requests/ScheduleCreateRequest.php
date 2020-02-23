@@ -6,7 +6,7 @@ use App\Enums\R;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class PriceCreateRequest extends FormRequest
+class ScheduleCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,13 +26,12 @@ class PriceCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'children_count' => R::CHILDREN_COUNT."|".
-                R::REQUIRED."|".
-                Rule::unique('prices')
-                    ->where('worker_id', \Auth::user()->worker->id)
+            'day' => R::REQUIRED."|".
+                R::DAY."|".
+                Rule::unique('schedules')->where('worker_id', \Auth::user()->worker->id)
                     ->whereNull('deleted_at'),
-            'amount_per_hour' => R::MONEY_SIMPLE."|".R::REQUIRED,
-            'over_time_amount_per_hour' => R::MONEY_SIMPLE,
+            'from' => R::TIME,
+            'to' => R::TIME."|".'after:from',
         ];
     }
 }

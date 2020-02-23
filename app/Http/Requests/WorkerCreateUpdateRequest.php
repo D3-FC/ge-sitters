@@ -34,8 +34,8 @@ class WorkerCreateUpdateRequest extends FormRequest
         return [
             'min_child_age'=>'integer|nullable|min:0|max:50',
             'max_child_age'=>'integer|nullable|gte:min_child_age|max:50',
-            'description'=>R::TEXT,
-            'animal_relationship'=>R::TEXT,
+            'description'=>R::TEXT_OPTIONAL,
+            'animal_relationship'=>R::TEXT_OPTIONAL,
             'meeting_price'=>R::MONEY_SIMPLE,
             'coords_x'=>R::COORDS,
             'coords_y'=>R::COORDS,

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PriceCreateRequest;
+use App\Http\Requests\ScheduleCreateRequest;
 use App\Price;
 use App\User;
 use Auth;
@@ -12,7 +13,7 @@ use Illuminate\Http\Request;
 class ScheduleController extends Controller
 {
 
-    public function create(PriceCreateRequest $request)
+    public function create(ScheduleCreateRequest $request)
     {
         if ($this->me()->is_admin) {
             abort(404); //TODO: implement
